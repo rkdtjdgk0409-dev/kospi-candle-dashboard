@@ -1,0 +1,18 @@
+{
+  "index_code": "KOSPI",
+  "index_name": "코스피",
+  "market_date": null,
+  "updated_at": "아직 갱신되지 않음",
+  "source_name": "네이버 증권",
+  "source_url": "https://m.stock.naver.com/domestic/index/KOSPI/total",
+  "latest": {
+    "close": 0,
+    "change": 0,
+    "change_rate": 0,
+    "open": 0,
+    "high": 0,
+    "low": 0,
+    "volume": 0
+  },
+  "rows": []
+}
