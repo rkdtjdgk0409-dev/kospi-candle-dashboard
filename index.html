@@ -2,565 +2,104 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>코스피 캔들 차트</title>
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"
-  ></script>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>코스피·코스닥 캔들 차트</title>
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
   <style>
-    :root {
-      --bg: #ffffff;
-      --text: #172033;
-      --muted: #6c7484;
-      --line: #e6e9ef;
-      --button: #eef1f5;
-      --button-text: #566074;
-      --active: #1565f5;
-      --up: #ef3340;
-      --down: #2f6edb;
-      --flat: #687386;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      width: 100%;
-      min-height: 0;
-      overflow: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family:
-        Pretendard,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-    }
-
-    .wrap {
-      width: 100%;
-      padding: 14px 16px 9px;
-    }
-
-    .title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 7px;
-      font-size: 19px;
-      font-weight: 750;
-    }
-
-    .title-icon {
-      color: var(--active);
-      font-size: 20px;
-      line-height: 1;
-    }
-
-    .summary {
-      display: flex;
-      align-items: baseline;
-      flex-wrap: wrap;
-      column-gap: 9px;
-      row-gap: 2px;
-      min-height: 41px;
-    }
-
-    .price {
-      font-size: clamp(26px, 4.5vw, 37px);
-      line-height: 1;
-      letter-spacing: -0.7px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .change {
-      font-size: 15px;
-      font-weight: 650;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .change.up {
-      color: var(--up);
-    }
-
-    .change.down {
-      color: var(--down);
-    }
-
-    .change.flat {
-      color: var(--flat);
-    }
-
-    .market-name {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin: 10px 0 7px;
-    }
-
-    .range-button {
-      min-width: 39px;
-      height: 28px;
-      padding: 0 10px;
-      border: 0;
-      border-radius: 7px;
-      background: var(--button);
-      color: var(--button-text);
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .range-button.active {
-      background: var(--active);
-      color: white;
-    }
-
-    .range-button:hover {
-      filter: brightness(0.97);
-    }
-
-    .ohlc {
-      min-width: 0;
-      margin-left: auto;
-      overflow: hidden;
-      color: var(--muted);
-      font-size: 10px;
-      font-variant-numeric: tabular-nums;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    #chart {
-      width: 100%;
-      height: 330px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .footer {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding-top: 7px;
-      color: var(--muted);
-      font-size: 10px;
-      line-height: 1.45;
-    }
-
-    .footer a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
-    }
-
-    .error {
-      display: none;
-      margin-top: 12px;
-      padding: 13px;
-      border: 1px solid #e5a2a7;
-      border-radius: 9px;
-      background: #fff5f5;
-      color: #a12732;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 720px) {
-      .wrap {
-        padding: 11px 10px 8px;
-      }
-
-      .title {
-        font-size: 17px;
-      }
-
-      .toolbar {
-        overflow-x: auto;
-        padding-bottom: 1px;
-      }
-
-      .ohlc {
-        display: none;
-      }
-
-      #chart {
-        height: 315px;
-      }
-
-      .footer {
-        flex-direction: column;
-        gap: 2px;
-      }
-    }
+    *{box-sizing:border-box} body{margin:0;background:#fff;color:#0f172a;font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .wrap{padding:20px 28px 14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:42px}
+    .card{min-width:0}.title{font-weight:800;font-size:20px;margin-bottom:5px}.title:before{content:"▥";color:#2563eb;margin-right:10px}
+    .value-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.value{font-family:Georgia,serif;font-size:31px}.change{font-weight:800;font-size:14px}
+    .up{color:#ff334f}.down{color:#2467dd}.sub{margin:12px 0 10px;color:#64748b;font-size:12px}
+    .buttons{display:flex;gap:7px;margin-bottom:8px}.buttons button{border:0;border-radius:8px;background:#edf1f6;color:#475569;font-weight:800;padding:8px 12px;cursor:pointer}
+    .buttons button.active{background:#1769ff;color:white}.chart{height:300px}.foot{border-top:1px solid #e2e8f0;margin-top:12px;padding-top:9px;color:#64748b;font-size:11px;line-height:1.8}
+    .status{text-align:right;color:#64748b;font-size:11px;margin-top:8px}.error{padding:18px;background:#fff1f2;color:#be123c;border-radius:10px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr;gap:32px}.wrap{padding:16px}.chart{height:330px}}
   </style>
 </head>
-
 <body>
-  <main class="wrap">
-    <div class="title">
-      <span class="title-icon">▥</span>
-      <span>코스피 캔들 차트</span>
-    </div>
+<div class="wrap">
+  <div id="error"></div>
+  <div class="grid">
+    <section class="card" id="card-kospi">
+      <div class="title">코스피 캔들 차트</div>
+      <div class="value-line"><span class="value"></span><span class="change"></span></div>
+      <div class="sub">코스피 · KOSPI · 일봉</div>
+      <div class="buttons"></div><div class="chart"></div><div class="foot"></div>
+    </section>
+    <section class="card" id="card-kosdaq">
+      <div class="title">코스닥 캔들 차트</div>
+      <div class="value-line"><span class="value"></span><span class="change"></span></div>
+      <div class="sub">코스닥 · KOSDAQ · 일봉</div>
+      <div class="buttons"></div><div class="chart"></div><div class="foot"></div>
+    </section>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+<script>
+const ranges={ "1M":23, "3M":66, "6M":132, "YTD":"YTD", "1Y":260, "MAX":"MAX" };
+const fmt=n=>Number(n).toLocaleString("ko-KR",{minimumFractionDigits:2,maximumFractionDigits:2});
 
-    <div class="summary">
-      <span class="price" id="price">—</span>
-      <span class="change flat" id="change">데이터를 불러오는 중…</span>
-    </div>
+function sliceRange(rows, key){
+  if(key==="MAX") return rows;
+  if(key==="YTD"){
+    const y=new Date().getFullYear().toString();
+    return rows.filter(x=>x.time.startsWith(y));
+  }
+  return rows.slice(-ranges[key]);
+}
 
-    <div class="market-name">코스피 · KOSPI · 일봉</div>
+function renderCard(key, market, updatedAt){
+  const root=document.getElementById("card-"+key);
+  const value=root.querySelector(".value"), change=root.querySelector(".change");
+  value.textContent=fmt(market.latest);
+  const up=market.change>=0;
+  change.className="change "+(up?"up":"down");
+  change.textContent=`${up?"▲":"▼"} ${up?"+":""}${fmt(market.change)} (${up?"+":""}${market.changePct.toFixed(2)}%)`;
+  root.querySelector(".foot").innerHTML=`기준: ${market.marketDate} · 갱신: ${updatedAt}<br>출처: Yahoo Finance 지연 시세 · 실시간 데이터가 아닐 수 있습니다.`;
 
-    <div class="toolbar">
-      <button class="range-button" data-range="1M">1M</button>
-      <button class="range-button active" data-range="3M">3M</button>
-      <button class="range-button" data-range="6M">6M</button>
-      <button class="range-button" data-range="YTD">YTD</button>
-      <button class="range-button" data-range="1Y">1Y</button>
-      <button class="range-button" data-range="MAX">MAX</button>
+  const chartEl=root.querySelector(".chart");
+  const chart=LightweightCharts.createChart(chartEl,{
+    width:chartEl.clientWidth,height:chartEl.clientHeight,
+    layout:{background:{color:"#fff"},textColor:"#64748b"},
+    grid:{vertLines:{color:"#e9eef5"},horzLines:{color:"#e9eef5"}},
+    rightPriceScale:{borderColor:"#dbe3ed"},timeScale:{borderColor:"#dbe3ed",timeVisible:false},
+    localization:{locale:"ko-KR"}
+  });
+  const candle=chart.addCandlestickSeries({upColor:"#ff4057",downColor:"#2868dc",borderVisible:false,wickUpColor:"#ff4057",wickDownColor:"#2868dc"});
+  const volume=chart.addHistogramSeries({priceFormat:{type:"volume"},priceScaleId:"",scaleMargins:{top:0.82,bottom:0}});
+  function setRange(r){
+    const rows=sliceRange(market.candles,r);
+    candle.setData(rows.map(x=>({time:x.time,open:x.open,high:x.high,low:x.low,close:x.close})));
+    volume.setData(rows.map(x=>({time:x.time,value:x.volume,color:x.close>=x.open?"rgba(255,64,87,.35)":"rgba(40,104,220,.35)"})));
+    chart.timeScale().fitContent();
+  }
+  const buttons=root.querySelector(".buttons");
+  Object.keys(ranges).forEach(r=>{
+    const b=document.createElement("button"); b.textContent=r;
+    b.onclick=()=>{buttons.querySelectorAll("button").forEach(x=>x.classList.remove("active"));b.classList.add("active");setRange(r)};
+    buttons.appendChild(b);
+    if(r==="3M"){b.classList.add("active");setRange(r)}
+  });
+  new ResizeObserver(()=>chart.applyOptions({width:chartEl.clientWidth,height:chartEl.clientHeight})).observe(chartEl);
+}
 
-      <div class="ohlc" id="ohlc">
-        캔들 위에 마우스를 올리면 시가·고가·저가·종가가 표시됩니다.
-      </div>
-    </div>
-
-    <div id="chart"></div>
-    <div class="error" id="error"></div>
-
-    <div class="footer">
-      <div>
-        기준: <strong id="marketDate">—</strong>
-        · 갱신: <span id="updatedAt">—</span>
-      </div>
-
-      <div>
-        <a
-          href="https://m.stock.naver.com/domestic/index/KOSPI/total"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          출처: 네이버 증권
-        </a>
-        · 실시간 데이터가 아닌 자동 갱신 데이터입니다.
-      </div>
-    </div>
-  </main>
-
-  <script>
-    const numberFormat = new Intl.NumberFormat("ko-KR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-
-    const compactFormat = new Intl.NumberFormat("ko-KR", {
-      notation: "compact",
-      maximumFractionDigits: 1
-    });
-
-    let allRows = [];
-    let candleSeries;
-    let volumeSeries;
-    let chart;
-    let currentRange = "3M";
-
-    function parseDate(dateString) {
-      const [year, month, day] = dateString.split("-").map(Number);
-      return new Date(year, month - 1, day);
-    }
-
-    function monthsAgo(date, months) {
-      const result = new Date(date);
-      result.setMonth(result.getMonth() - months);
-      return result;
-    }
-
-    function filterRows(range) {
-      if (!allRows.length || range === "MAX") {
-        return allRows;
-      }
-
-      const lastDate = parseDate(allRows[allRows.length - 1].time);
-      let startDate;
-
-      if (range === "1M") {
-        startDate = monthsAgo(lastDate, 1);
-      } else if (range === "3M") {
-        startDate = monthsAgo(lastDate, 3);
-      } else if (range === "6M") {
-        startDate = monthsAgo(lastDate, 6);
-      } else if (range === "1Y") {
-        startDate = monthsAgo(lastDate, 12);
-      } else if (range === "YTD") {
-        startDate = new Date(lastDate.getFullYear(), 0, 1);
-      } else {
-        return allRows;
-      }
-
-      return allRows.filter(row => parseDate(row.time) >= startDate);
-    }
-
-    function updateOhlc(row) {
-      if (!row) {
-        document.getElementById("ohlc").textContent =
-          "캔들 위에 마우스를 올리면 시가·고가·저가·종가가 표시됩니다.";
-        return;
-      }
-
-      document.getElementById("ohlc").textContent =
-        `${row.time}  시 ${numberFormat.format(row.open)}  ` +
-        `고 ${numberFormat.format(row.high)}  ` +
-        `저 ${numberFormat.format(row.low)}  ` +
-        `종 ${numberFormat.format(row.close)}  ` +
-        `거래량 ${compactFormat.format(row.volume || 0)}`;
-    }
-
-    function drawRange(range) {
-      currentRange = range;
-
-      document.querySelectorAll(".range-button").forEach(button => {
-        button.classList.toggle(
-          "active",
-          button.dataset.range === range
-        );
-      });
-
-      const rows = filterRows(range);
-
-      candleSeries.setData(
-        rows.map(row => ({
-          time: row.time,
-          open: row.open,
-          high: row.high,
-          low: row.low,
-          close: row.close
-        }))
-      );
-
-      volumeSeries.setData(
-        rows.map(row => ({
-          time: row.time,
-          value: row.volume || 0,
-          color:
-            row.close >= row.open
-              ? "rgba(239, 51, 64, 0.36)"
-              : "rgba(47, 110, 219, 0.36)"
-        }))
-      );
-
-      chart.timeScale().fitContent();
-      updateOhlc(rows[rows.length - 1]);
-    }
-
-    function createChart() {
-      const container = document.getElementById("chart");
-
-      chart = LightweightCharts.createChart(container, {
-        width: container.clientWidth,
-        height: container.clientHeight,
-
-        layout: {
-          background: {
-            type: "solid",
-            color: "#ffffff"
-          },
-          textColor: "#667085",
-          fontFamily:
-            'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-          fontSize: 10
-        },
-
-        grid: {
-          vertLines: {
-            color: "#f0f2f6"
-          },
-          horzLines: {
-            color: "#f0f2f6"
-          }
-        },
-
-        crosshair: {
-          mode: LightweightCharts.CrosshairMode.Normal
-        },
-
-        rightPriceScale: {
-          borderColor: "#e6e9ef",
-          scaleMargins: {
-            top: 0.08,
-            bottom: 0.25
-          }
-        },
-
-        timeScale: {
-          borderColor: "#e6e9ef",
-          timeVisible: false,
-          secondsVisible: false,
-          rightOffset: 2,
-          barSpacing: 9,
-          minBarSpacing: 3,
-          fixLeftEdge: true,
-          lockVisibleTimeRangeOnResize: true
-        },
-
-        localization: {
-          locale: "ko-KR",
-          priceFormatter: price => numberFormat.format(price)
-        },
-
-        handleScroll: {
-          mouseWheel: true,
-          pressedMouseMove: true,
-          horzTouchDrag: true,
-          vertTouchDrag: false
-        },
-
-        handleScale: {
-          axisPressedMouseMove: true,
-          mouseWheel: true,
-          pinch: true
-        }
-      });
-
-      candleSeries = chart.addCandlestickSeries({
-        upColor: "#ef3340",
-        downColor: "#2f6edb",
-        borderUpColor: "#ef3340",
-        borderDownColor: "#2f6edb",
-        wickUpColor: "#ef3340",
-        wickDownColor: "#2f6edb",
-        priceLineVisible: true,
-        lastValueVisible: true
-      });
-
-      volumeSeries = chart.addHistogramSeries({
-        priceFormat: {
-          type: "volume"
-        },
-        priceScaleId: "",
-        lastValueVisible: false,
-        priceLineVisible: false
-      });
-
-      volumeSeries.priceScale().applyOptions({
-        scaleMargins: {
-          top: 0.82,
-          bottom: 0
-        }
-      });
-
-      chart.subscribeCrosshairMove(param => {
-        if (!param.time) {
-          updateOhlc(filterRows(currentRange).at(-1));
-          return;
-        }
-
-        const time =
-          typeof param.time === "string"
-            ? param.time
-            : `${param.time.year}-${String(param.time.month).padStart(2, "0")}-${String(param.time.day).padStart(2, "0")}`;
-
-        const row = allRows.find(item => item.time === time);
-        updateOhlc(row);
-      });
-
-      const resizeObserver = new ResizeObserver(entries => {
-        for (const entry of entries) {
-          chart.applyOptions({
-            width: entry.contentRect.width,
-            height: entry.contentRect.height
-          });
-        }
-      });
-
-      resizeObserver.observe(container);
-    }
-
-    function showSummary(data) {
-      const latest = data.latest;
-      const changeElement = document.getElementById("change");
-
-      document.getElementById("price").textContent =
-        numberFormat.format(latest.close);
-
-      const isUp = latest.change > 0;
-      const isDown = latest.change < 0;
-      const arrow = isUp ? "▲" : isDown ? "▼" : "―";
-      const sign = isUp ? "+" : "";
-
-      changeElement.className =
-        `change ${isUp ? "up" : isDown ? "down" : "flat"}`;
-
-      changeElement.textContent =
-        `${arrow} ${sign}${numberFormat.format(latest.change)} ` +
-        `(${sign}${latest.change_rate.toFixed(2)}%)`;
-
-      document.getElementById("marketDate").textContent =
-        data.market_date;
-
-      document.getElementById("updatedAt").textContent =
-        data.updated_at;
-    }
-
-    function showError(message) {
-      document.getElementById("chart").style.display = "none";
-      document.querySelector(".toolbar").style.display = "none";
-
-      const error = document.getElementById("error");
-      error.style.display = "block";
-      error.innerHTML =
-        `<strong>차트 데이터를 표시하지 못했습니다.</strong><br>` +
-        `${message}<br><br>` +
-        `GitHub 저장소의 Actions 메뉴에서 코스피 데이터 갱신 작업을 실행해 주세요.`;
-
-      document.getElementById("change").textContent =
-        "갱신이 필요합니다.";
-    }
-
-    async function loadData() {
-      try {
-        const response = await fetch(`data.json?t=${Date.now()}`);
-
-        if (!response.ok) {
-          throw new Error("data.json 파일을 불러오지 못했습니다.");
-        }
-
-        const data = await response.json();
-
-        if (!Array.isArray(data.rows) || data.rows.length < 2) {
-          throw new Error(
-            "아직 실제 코스피 데이터가 없습니다. Actions를 먼저 실행해 주세요."
-          );
-        }
-
-        allRows = data.rows;
-        showSummary(data);
-        createChart();
-        drawRange("3M");
-
-        document.querySelectorAll(".range-button").forEach(button => {
-          button.addEventListener("click", () => {
-            drawRange(button.dataset.range);
-          });
-        });
-      } catch (error) {
-        showError(error.message);
-      }
-    }
-
-    loadData();
-  </script>
+async function load(){
+  try{
+    const res=await fetch(`data.json?v=${Date.now()}`,{cache:"no-store"});
+    if(!res.ok) throw new Error(`data.json HTTP ${res.status}`);
+    const data=await res.json();
+    if(data.markets.kospi) renderCard("kospi",data.markets.kospi,data.updatedAt);
+    if(data.markets.kosdaq) renderCard("kosdaq",data.markets.kosdaq,data.updatedAt);
+    document.getElementById("status").textContent=`마지막 자동 갱신 ${data.updatedAt}`;
+    if(data.errors) document.getElementById("error").innerHTML=`<div class="error">일부 데이터 갱신 실패: ${JSON.stringify(data.errors)}</div>`;
+  }catch(e){
+    document.getElementById("error").innerHTML=`<div class="error">차트 데이터를 불러오지 못했습니다: ${e.message}</div>`;
+  }
+}
+load();
+setInterval(load, 10*60*1000);
+</script>
 </body>
 </html>
