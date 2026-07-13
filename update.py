@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import time
 from datetime import datetime
 from pathlib import Path
@@ -12,25 +11,22 @@ import yfinance as yf
 
 SEOUL = ZoneInfo("Asia/Seoul")
 OUTPUT = Path("data.json")
-
-MARKETS = {
-    "kospi": {"ticker": "^KS11", "name": "코스피", "unit": "KOSPI"},
-    "kosdaq": {"ticker": "^KQ11", "name": "코스닥", "unit": "KOSDAQ"},
-}
+TICKER = "^KS11"
 
 
-def _safe_float(value):
+def safe_float(value):
     if value is None or pd.isna(value):
         return None
     return round(float(value), 4)
 
 
-def _download(ticker: str, period: str, interval: str) -> pd.DataFrame:
+def download_data(period: str, interval: str) -> pd.DataFrame:
     last_error = None
+
     for attempt in range(3):
         try:
             df = yf.download(
-                ticker,
+                TICKER,
                 period=period,
                 interval=interval,
                 auto_adjust=False,
@@ -38,72 +34,99 @@ def _download(ticker: str, period: str, interval: str) -> pd.DataFrame:
                 threads=False,
                 timeout=30,
             )
+
             if not df.empty:
                 if isinstance(df.columns, pd.MultiIndex):
                     df.columns = df.columns.get_level_values(0)
                 return df
+
         except Exception as exc:
             last_error = exc
+
         time.sleep(3 * (attempt + 1))
-    raise RuntimeError(f"{ticker} 데이터 수집 실패: {last_error}")
+
+    raise RuntimeError(f"코스피 데이터 수집 실패: {last_error}")
 
 
-def _normalize_index(df: pd.DataFrame) -> pd.DataFrame:
-    out = df.copy()
-    idx = pd.to_datetime(out.index)
-    if idx.tz is None:
-        idx = idx.tz_localize("UTC").tz_convert(SEOUL)
+def normalize_index(df: pd.DataFrame) -> pd.DataFrame:
+    result = df.copy()
+    index = pd.to_datetime(result.index)
+
+    if index.tz is None:
+        index = index.tz_localize("UTC").tz_convert(SEOUL)
     else:
-        idx = idx.tz_convert(SEOUL)
-    out.index = idx
-    return out
+        index = index.tz_convert(SEOUL)
+
+    result.index = index
+    return result
 
 
-def load_market(ticker: str) -> dict:
-    daily = _normalize_index(_download(ticker, "1y", "1d"))
-    intraday = _normalize_index(_download(ticker, "5d", "5m"))
+def load_kospi() -> dict:
+    daily = normalize_index(download_data("1y", "1d"))
+    intraday = normalize_index(download_data("5d", "5m"))
 
     daily = daily.dropna(subset=["Open", "High", "Low", "Close"])
     intraday = intraday.dropna(subset=["Close"])
 
-    # 최근 장중 시세로 오늘 일봉을 보정합니다.
+    # 당일 5분봉을 이용해 최신 일봉을 보정합니다.
     if not intraday.empty:
         latest_day = intraday.index[-1].date()
         today_rows = intraday[intraday.index.date == latest_day]
+
         if not today_rows.empty:
-            row = {
-                "Open": float(today_rows["Open"].dropna().iloc[0]),
+            open_value = today_rows["Open"].dropna().iloc[0]
+            close_value = today_rows["Close"].dropna().iloc[-1]
+
+            new_row = {
+                "Open": float(open_value),
                 "High": float(today_rows["High"].max()),
                 "Low": float(today_rows["Low"].min()),
-                "Close": float(today_rows["Close"].dropna().iloc[-1]),
+                "Close": float(close_value),
                 "Volume": float(today_rows["Volume"].fillna(0).sum()),
             }
-            ts = pd.Timestamp(datetime.combine(latest_day, datetime.min.time()), tz=SEOUL)
+
+            timestamp = pd.Timestamp(
+                datetime.combine(latest_day, datetime.min.time()),
+                tz=SEOUL,
+            )
+
             daily = daily[daily.index.date != latest_day]
-            daily.loc[ts] = row
+            daily.loc[timestamp] = new_row
             daily = daily.sort_index()
 
     daily = daily.tail(260)
+
     candles = []
-    for ts, row in daily.iterrows():
-        candles.append({
-            "time": ts.strftime("%Y-%m-%d"),
-            "open": _safe_float(row["Open"]),
-            "high": _safe_float(row["High"]),
-            "low": _safe_float(row["Low"]),
-            "close": _safe_float(row["Close"]),
-            "volume": int(float(row.get("Volume", 0) or 0)),
-        })
+
+    for timestamp, row in daily.iterrows():
+        candles.append(
+            {
+                "time": timestamp.strftime("%Y-%m-%d"),
+                "open": safe_float(row["Open"]),
+                "high": safe_float(row["High"]),
+                "low": safe_float(row["Low"]),
+                "close": safe_float(row["Close"]),
+                "volume": int(float(row.get("Volume", 0) or 0)),
+            }
+        )
 
     if len(candles) < 2:
-        raise RuntimeError(f"{ticker}: 표시할 데이터가 부족합니다.")
+        raise RuntimeError("표시할 코스피 데이터가 부족합니다.")
 
     latest = candles[-1]
-    prev = candles[-2]
-    change = latest["close"] - prev["close"]
-    change_pct = change / prev["close"] * 100 if prev["close"] else 0
+    previous = candles[-2]
+
+    change = latest["close"] - previous["close"]
+    change_pct = (
+        change / previous["close"] * 100
+        if previous["close"]
+        else 0
+    )
 
     return {
+        "ticker": TICKER,
+        "name": "코스피",
+        "unit": "KOSPI",
         "latest": latest["close"],
         "change": round(change, 2),
         "changePct": round(change_pct, 2),
@@ -114,29 +137,29 @@ def load_market(ticker: str) -> dict:
 
 def main():
     now = datetime.now(SEOUL)
+
     payload = {
         "updatedAt": now.strftime("%Y-%m-%d %H:%M:%S KST"),
         "source": "Yahoo Finance 지연 시세",
-        "markets": {},
+        "market": load_kospi(),
     }
 
-    errors = {}
-    for key, meta in MARKETS.items():
-        try:
-            payload["markets"][key] = {**meta, **load_market(meta["ticker"])}
-        except Exception as exc:
-            errors[key] = str(exc)
+    temp_file = OUTPUT.with_suffix(".tmp")
+    temp_file.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    temp_file.replace(OUTPUT)
 
-    if errors:
-        payload["errors"] = errors
-
-    if not payload["markets"]:
-        raise RuntimeError(f"모든 시장 데이터 수집 실패: {errors}")
-
-    tmp = OUTPUT.with_suffix(".tmp")
-    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(OUTPUT)
-    print(json.dumps({"updatedAt": payload["updatedAt"], "errors": errors}, ensure_ascii=False))
+    print(
+        json.dumps(
+            {
+                "updatedAt": payload["updatedAt"],
+                "latest": payload["market"]["latest"],
+            },
+            ensure_ascii=False,
+        )
+    )
 
 
 if __name__ == "__main__":
