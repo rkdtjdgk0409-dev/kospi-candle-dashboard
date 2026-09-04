@@ -1,23 +1,15 @@
 {
-  "updatedAt": "2026-09-03 20:48:47 KST",
+  "updatedAt": "2026-09-04 20:50:17 KST",
   "source": "Yahoo Finance 지연 시세",
   "market": {
     "ticker": "^KS11",
     "name": "코스피",
     "unit": "KOSPI",
-    "latest": 6598.23,
-    "change": 35.51,
-    "changePct": 0.54,
-    "marketDate": "2026-09-03",
+    "latest": 6706.5601,
+    "change": 127.08,
+    "changePct": 1.93,
+    "marketDate": "2026-09-04",
     "candles": [
-      {
-        "time": "2025-09-03",
-        "open": 3177.75,
-        "high": 3187.48,
-        "low": 3167.23,
-        "close": 3184.4199,
-        "volume": 335800
-      },
       {
         "time": "2025-09-04",
         "open": 3188.8401,
@@ -1959,8 +1951,16 @@
         "open": 6650.3301,
         "high": 6682.9702,
         "low": 6439.4902,
-        "close": 6598.23,
-        "volume": 330790
+        "close": 6579.48,
+        "volume": 433500
+      },
+      {
+        "time": "2026-09-04",
+        "open": 6654.3599,
+        "high": 6746.1401,
+        "low": 6632.77,
+        "close": 6706.5601,
+        "volume": 215835
       }
     ]
   }
